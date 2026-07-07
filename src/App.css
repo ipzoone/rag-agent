@@ -146,6 +146,225 @@
   user-select: none;
 }
 
+/* ── Floating Chat Widget ──────────────── */
+.chat-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.chat-fab--hidden {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+
+.chat-fab-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 135, 122, 0.35);
+  transition: all 0.25s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.chat-fab-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(0, 135, 122, 0.45);
+}
+
+.chat-fab-btn:active {
+  transform: translateY(0);
+}
+
+.chat-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  width: 380px;
+  height: 560px;
+  max-height: calc(100vh - 100px);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(16px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: bottom right;
+}
+
+.chat-widget--open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.chat-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  flex-shrink: 0;
+}
+
+.chat-widget-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.widget-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(0, 135, 122, 0.35);
+  animation: pulse-teal 2s ease-in-out infinite;
+}
+
+@keyframes pulse-teal {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+.widget-title-text {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.widget-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.widget-close-btn:hover {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+}
+
+.chat-widget-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Widget overrides for RagChat */
+.chat-widget-body .rag-chat {
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  max-height: none;
+  flex: 1;
+  background: transparent;
+}
+
+.chat-widget-body .chat-header {
+  display: none;
+}
+
+.chat-widget-body .chat-messages {
+  padding: 20px 16px;
+  gap: 18px;
+}
+
+.chat-widget-body .chat-clear-mini {
+  top: 8px;
+  right: 8px;
+}
+
+.chat-widget-body .chat-input-bar {
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-top-color: var(--border);
+  gap: 10px;
+}
+
+.chat-widget-body .chat-input {
+  padding: 10px 14px;
+  font-size: 0.85rem;
+}
+
+.chat-widget-body .chat-send-btn {
+  width: 38px;
+  height: 38px;
+}
+
+.chat-widget-body .chat-clear-circle-btn {
+  width: 32px;
+  height: 32px;
+}
+
+.chat-widget-body .preset-chips--inline {
+  display: none;
+}
+
+.chat-widget-body .chat-empty {
+  padding: 32px 16px;
+}
+
+.chat-widget-body .chat-empty-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 14px;
+}
+
+.chat-widget-body .chat-empty-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.chat-widget-body .chat-empty-title {
+  font-size: 1.1rem;
+}
+
+.chat-widget-body .chat-empty-desc {
+  font-size: 0.8rem;
+  margin-bottom: 20px;
+}
+
+.chat-widget-body .preset-chip {
+  font-size: 0.75rem;
+  padding: 6px 12px;
+}
+
+.chat-widget-body .streaming-indicator {
+  padding: 10px 14px;
+  margin: 0 16px;
+}
+
+.chat-widget-body .chat-error {
+  margin: 0 16px;
+}
+
 /* ── Mobile ────────────────────────────── */
 @media (max-width: 640px) {
   .app-shell {

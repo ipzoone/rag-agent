@@ -339,19 +339,15 @@ export default function RagChat() {
 
   return (
     <div className="rag-chat">
-      <div className="chat-header">
-        <div className="chat-header-left">
-          <div className="chat-indicator" />
-          <span className="chat-title">{t("chat.title")}</span>
-        </div>
+      <div className="chat-messages" ref={messagesContainerRef}>
         {messages.length > 0 && (
-          <button className="chat-clear-btn" onClick={handleClear}>
-            {t("chat.newSession")}
+          <button className="chat-clear-mini" onClick={handleClear} title={t("aria.clearConversation")}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            </svg>
           </button>
         )}
-      </div>
-
-      <div className="chat-messages" ref={messagesContainerRef}>
         {historyLoading && messages.length === 0 && (
           <div className="chat-empty">
             <div className="streaming-dots">
