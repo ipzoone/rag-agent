@@ -373,7 +373,7 @@ export default function RagChat() {
               {t("chat.emptyDesc")}
             </p>
             <div className="preset-chips">
-              {[t("preset.1"), t("preset.2")].map((q) => (
+              {[t("preset.1"), t("preset.2"), t("preset.3")].map((q) => (
                 <button
                   key={q}
                   className="preset-chip"
@@ -443,7 +443,7 @@ export default function RagChat() {
 
       {messages.length > 0 && (
         <div className="preset-chips preset-chips--inline">
-          {[t("preset.1"), t("preset.2")].map((q) => (
+          {[t("preset.1"), t("preset.2"), t("preset.3")].map((q) => (
             <button
               key={q}
               className="preset-chip preset-chip--small"
