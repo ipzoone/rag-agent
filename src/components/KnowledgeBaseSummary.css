@@ -47,9 +47,9 @@
 }
 
 .kb-refresh-btn:hover:not(:disabled) {
-  color: var(--accent);
-  border-color: var(--border-accent);
-  background: var(--accent-dim);
+  color: var(--accent-warm);
+  border-color: var(--accent-warm-dim);
+  background: var(--accent-warm-dim);
 }
 
 .kb-refresh-btn:disabled {

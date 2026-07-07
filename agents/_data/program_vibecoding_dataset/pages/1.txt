@@ -1,0 +1,35 @@
+KNOWLEDGE BASE CODEPOLITAN - UNTUK
+DATASET RAG AI
+Dokumen ini berisi informasi resmi mengenai daftar kelas, rincian biaya, dan tata cara pendaftaran di platform
+Codepolitan.
+1. Program: DevHandal 2026 (Full Stack AI & Edge Computing)
+Deskripsi Program:
+Program beasiswa kolaborasi global untuk menguasai teknologi AI dan Edge
+Computing bersertifikat Tencent EdgeOne / Alibaba Cloud.
+Biaya Pendidikan:
+Gratis (Beasiswa Penuh bagi yang lolos misi)
+Cara Pendaftaran:
+1. Akses halaman resmi DevHandal.
+2. Buat akun dan selesaikan misi pendaftaran sebelum kuota penuh.
+3. Klaim akses kelas setelah misi diverifikasi.
+2. Program: Program KodeBisat (Fullstack PHP/Laravel/MEVN)
+Deskripsi Program:
+Beasiswa belajar intensif fullstack developer untuk mempersiapkan karir di industri
+teknologi modern.
+Biaya Pendidikan:
+Gratis (Program Beasiswa Seleksi)
+Cara Pendaftaran:
+1. Kunjungi situs kodebisat.id.
+2. Daftarkan akun baru dan isi formulir data diri dengan lengkap.
+3. Ikuti alur tes seleksi masuk program.
+3. Program: Kelas Premium Codepolitan (Self-Paced Learning)
+Deskripsi Program:
+Akses ke puluhan materi coding terstruktur mulai dari Basic HTML, CSS,
+JavaScript, hingga Python Backend.
+Biaya Pendidikan:
+Mulai dari Rp 200.000 - Rp 2.000.000+ (Tergantung paket/bundling)
+Cara Pendaftaran:
+1. Log in ke akun Codepolitan Anda.
+2. Pilih kelas premium yang diinginkan di katalog.
+3. Lakukan pembayaran via Payment Gateway yang tersedia.
+4. Kelas langsung aktif selamanya.

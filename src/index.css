@@ -12,20 +12,26 @@
   --text-secondary: #9ca3af;
   --text-muted: #6b7280;
 
-  /* ── Accent (warm amber) ── */
-  --accent: #d4a853;
-  --accent-dim: #d4a85320;
-  --accent-hover: #e0b865;
-  --accent-glow: rgba(212, 168, 83, 0.12);
-  --accent-subtle: rgba(212, 168, 83, 0.07);
+  /* ── Accent (teal) ── */
+  --accent: #00877A;
+  --accent-dim: rgba(0, 135, 122, 0.10);
+  --accent-hover: #00A894;
+  --accent-glow: rgba(0, 135, 122, 0.15);
+  --accent-subtle: rgba(0, 135, 122, 0.06);
+
+  /* ── Secondary Accent (salmon) ── */
+  --accent-warm: #E07784;
+  --accent-warm-dim: rgba(224, 119, 132, 0.10);
+  --accent-warm-hover: #E88D98;
+  --accent-warm-glow: rgba(224, 119, 132, 0.12);
 
   /* ── Borders ── */
   --border: #2a2f3a;
-  --border-accent: #d4a85340;
+  --border-accent: rgba(0, 135, 122, 0.25);
 
   /* ── Semantic ── */
   --error: #ef4444;
-  --success: #10b981;
+  --success: #00877A;
 
   /* ── Typography ── */
   --font-heading: 'Instrument Serif', Georgia, serif;
