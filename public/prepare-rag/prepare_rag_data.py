@@ -33,7 +33,7 @@ Execution flow:
   3. Clear agents/_data/ and rebuild from scratch
   4. Generate agents/_data/index.json as the runtime manifest
 
-⚠️ This directory is NOT exposed via express.static; it's only read by the server
+[WARN] This directory is NOT exposed via express.static; it's only read by the server
    (see agents/loader.js).
 """
 
@@ -80,7 +80,7 @@ def extract_pages(pdf_path: Path, PdfReader) -> tuple[dict[int, str], int]:
         try:
             text = page.extract_text() or ""
         except Exception as e:
-            print(f"    ⚠️  Page {i + 1} extraction failed: {e}", file=sys.stderr)
+            print(f"    [WARN] Page {i + 1} extraction failed: {e}", file=sys.stderr)
             text = ""
         pages[i + 1] = text.strip()
     return pages, len(reader.pages)
@@ -105,7 +105,7 @@ def write_document(
     doc_id: str,
 ) -> dict:
     """Write meta.json / structure.json / pages/{n}.txt for a single PDF. Returns index.json entry."""
-    print(f"\n  📄 {pdf_path.name}  →  doc_id: {doc_id}")
+    print(f"\n  [FILE] {pdf_path.name}  ->  doc_id: {doc_id}")
 
     # 1. Extract PDF text
     pages, page_count = extract_pages(pdf_path, PdfReader)
@@ -194,24 +194,24 @@ def main() -> None:
 
     # Check files directory
     if not FILES_DIR.exists():
-        print(f"❌ Directory does not exist: {FILES_DIR}", file=sys.stderr)
+        print(f"[ERROR] Directory does not exist: {FILES_DIR}", file=sys.stderr)
         sys.exit(1)
 
     pdf_files = sorted(FILES_DIR.glob("*.pdf"))
     if not pdf_files:
-        print(f"⚠️  No PDF files found in {FILES_DIR}")
+        print(f"[WARN] No PDF files found in {FILES_DIR}")
         sys.exit(0)
 
-    print(f"\n📁 Scanning directory: {FILES_DIR}")
+    print(f"\n[DIR] Scanning directory: {FILES_DIR}")
     print(f"   Found {len(pdf_files)} PDF file(s):")
     for p in pdf_files:
         has_index = p.with_suffix(".json").exists()
-        marker = "  ✦" if has_index else "  ·"
+        marker = "  [i]" if has_index else "  ·"
         print(f"{marker} {p.name}" + (" [has index]" if has_index else ""))
 
     # Clear and rebuild output directory
     if RAG_OUT_DIR.exists():
-        print(f"\n🗑️  Clearing old directory: {RAG_OUT_DIR}")
+        print(f"\n[CLEAN] Clearing old directory: {RAG_OUT_DIR}")
         shutil.rmtree(RAG_OUT_DIR)
     RAG_OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -253,7 +253,7 @@ def main() -> None:
     print(f"   Manifest:     {index_path.relative_to(PROJECT_ROOT)}")
 
     print("\n" + "=" * 60)
-    print("  ✅ RAG data generation complete!")
+    print("  [DONE] RAG data generation complete!")
     print("=" * 60)
     for doc_id in used_ids:
         print(f"   doc_id: {doc_id}")

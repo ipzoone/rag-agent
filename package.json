@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "vite",
     "dev:agents": "edgeone makers dev",
-    "build": "set PYTHONIOENCODING=utf-8 && python public/prepare-rag/prepare_rag_data.py && vite build",
+    "build": "python3 public/prepare-rag/prepare_rag_data.py && vite build",
     "preview": "vite preview",
-    "prepare-rag": "set PYTHONIOENCODING=utf-8 && python public/prepare-rag/prepare_rag_data.py"
+    "prepare-rag": "python3 public/prepare-rag/prepare_rag_data.py"
   },
   "dependencies": {
     "react": "^19.2.4",
