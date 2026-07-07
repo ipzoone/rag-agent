@@ -1,0 +1,261 @@
+/* ── Top Bar ──────────────────────────── */
+.hero-topbar {
+  background: #151515;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 14px 40px;
+  font-size: 14px;
+}
+
+.hero-topbar a {
+  color: #cfcfcf;
+  text-decoration: none;
+  padding-bottom: 14px;
+}
+
+.hero-topbar a.active {
+  color: #fff;
+  font-weight: 600;
+  border-bottom: 2px solid #fff;
+}
+
+/* ── Navbar ──────────────────────────── */
+.hero-navbar {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 40px;
+}
+
+.hero-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-logo-mark {
+  width: 34px;
+  height: 34px;
+  position: relative;
+}
+
+.hero-logo-mark span {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+}
+
+.hero-logo-mark span:first-child {
+  background: #0f766e;
+  left: 0;
+  top: 0;
+  transform: rotate(20deg);
+}
+
+.hero-logo-mark span:last-child {
+  background: #e5477a;
+  right: 0;
+  bottom: 0;
+  transform: rotate(20deg);
+}
+
+.hero-logo-text {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: 0.5px;
+}
+
+.hero-logo-text span {
+  color: #0f766e;
+}
+
+.hero-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.hero-menu div {
+  width: 26px;
+  height: 2px;
+  background: #333;
+}
+
+/* ── Hero Section ────────────────────── */
+.hero-section {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 70px 40px 90px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  color: #2dd4bf;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 8px 18px;
+  border-radius: 30px;
+  margin-bottom: 24px;
+}
+
+.hero-section h1 {
+  font-size: 46px;
+  line-height: 1.15;
+  font-weight: 800;
+  margin-bottom: 22px;
+  color: #f1f5f4;
+}
+
+.hero-accent {
+  color: #2dd4bf;
+}
+
+.hero-lead {
+  color: #b9c8c6;
+  font-size: 16px;
+  line-height: 1.7;
+  max-width: 520px;
+  margin-bottom: 32px;
+}
+
+.hero-cta-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+
+.hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 15px 26px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+}
+
+.hero-btn--primary {
+  background: #2dd4bf;
+  color: #04201d;
+}
+
+.hero-btn--primary:hover {
+  background: #26c4b0;
+}
+
+.hero-btn--outline {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hero-btn--outline:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.hero-chip-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hero-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #f1f5f4;
+}
+
+/* ── Visual ──────────────────────────── */
+.hero-visual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-visual-panel {
+  width: 100%;
+  aspect-ratio: 4 / 3.2;
+  border-radius: 28px;
+  overflow: hidden;
+  background: #0e2a28;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.hero-visual-panel::before {
+  content: "";
+  position: absolute;
+  top: 20px;
+  right: 60px;
+  width: 70px;
+  height: 70px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15), transparent 70%);
+  border-radius: 50%;
+}
+
+.hero-visual-placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.hero-cross {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 20px;
+}
+
+.hero-cross.c1 { top: 14%; left: 38%; }
+.hero-cross.c2 { top: 34%; left: 52%; }
+.hero-cross.c3 { top: 52%; right: 6%; }
+.hero-cross.c4 { bottom: 20%; left: 2%; }
+
+/* ── Mobile ──────────────────────────── */
+@media (max-width: 900px) {
+  .hero-section {
+    grid-template-columns: 1fr;
+    padding: 40px 20px;
+  }
+
+  .hero-section h1 {
+    font-size: 32px;
+  }
+
+  .hero-topbar {
+    gap: 18px;
+    padding: 10px 20px;
+    font-size: 12px;
+    overflow-x: auto;
+  }
+
+  .hero-navbar {
+    padding: 14px 20px;
+  }
+
+  .hero-visual {
+    margin-top: 40px;
+  }
+}

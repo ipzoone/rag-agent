@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
-import { I18nProvider, LangToggle, useT } from "./i18n";
+import { I18nProvider, LangToggle } from "./i18n";
 import RagChat from "./components/RagChat";
+import HeroSection from "./components/HeroSection";
 import KnowledgeBaseSummary from "./components/KnowledgeBaseSummary";
 import GitHubLink from "./components/GitHubLink";
 import DeployLink from "./components/DeployLink";
@@ -28,25 +29,17 @@ export default function App() {
 }
 
 function AppInner() {
-  const { t } = useT();
   const conversationIdRef = useRef<string>(getOrCreateConversationId());
   const [chatOpen, setChatOpen] = useState(false);
 
   return (
     <>
-      <div className="app-shell">
-        <header className="app-header">
-          <div className="app-brand">
-            <div className="brand-mark" />
-            <div className="brand-text">
-              <h1>{t("app.title")}</h1>
-              <p>{t("app.subtitle")}</p>
-            </div>
-          </div>
-        </header>
-        <main className="app-main">
+      <div className="app-wrap">
+        <HeroSection />
+
+        <div className="kb-mini">
           <KnowledgeBaseSummary conversationId={conversationIdRef.current} />
-        </main>
+        </div>
       </div>
 
       <div className={`chat-fab ${chatOpen ? "chat-fab--hidden" : ""}`}>
