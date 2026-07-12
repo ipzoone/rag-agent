@@ -47,8 +47,9 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 
-# Generated RAG knowledge base (PDF extractions + Chroma vector store)
-agents/_data/
+# Generated RAG knowledge base is committed so the deployed agent has the
+# vector store available (rebuilt locally via `npm run prepare-rag`).
+# agents/_data/
 
 # Misc
 .npm

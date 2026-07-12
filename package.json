@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "dev:agents": "edgeone makers dev",
-    "build": "python3 public/prepare-rag/prepare_rag_data.py || python public/prepare-rag/prepare_rag_data.py && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "prepare-rag": "python3 public/prepare-rag/prepare_rag_data.py || python public/prepare-rag/prepare_rag_data.py"
   },

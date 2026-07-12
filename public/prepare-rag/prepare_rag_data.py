@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 prepare_rag_data.py — Scan the ./files/ directory and write RAG knowledge base
 data into the project's private data directory.
