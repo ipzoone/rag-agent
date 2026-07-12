@@ -73,7 +73,11 @@ LOCAL_EMBED_MODEL = os.getenv("LOCAL_EMBED_MODEL", "sentence-transformers/paraph
 CHROMA_COLLECTION = "rag_chunks"
 
 
-# ── PDF Text Extraction ──────────────────────────────────────────────────────
+# ── Text Extraction (PDF / DOCX / XLSX / PPTX) ───────────────────────────────
+
+# Supported source document extensions.
+ALLOWED_EXT = {".pdf", ".docx", ".xlsx", ".pptx"}
+
 
 def load_pdf_reader():
     """Import pypdf or PyPDF2; exit with error if neither is available."""
@@ -90,7 +94,7 @@ def load_pdf_reader():
         sys.exit(1)
 
 
-def extract_pages(pdf_path: Path, PdfReader) -> tuple[dict[int, str], int]:
+def extract_pdf(pdf_path: Path, PdfReader) -> tuple[dict[int, str], int]:
     """Extract text from each PDF page. Returns {page_number: text} and total page count."""
     reader = PdfReader(str(pdf_path))
     pages: dict[int, str] = {}
@@ -102,6 +106,99 @@ def extract_pages(pdf_path: Path, PdfReader) -> tuple[dict[int, str], int]:
             text = ""
         pages[i + 1] = text.strip()
     return pages, len(reader.pages)
+
+
+def _split_text_to_pages(text: str, size: int = 1800) -> dict[int, str]:
+    """Split a flat text blob into synthetic 'pages' of ~`size` chars (for formats without pages)."""
+    text = (text or "").strip()
+    if not text:
+        return {}
+    pages: dict[int, str] = {}
+    n = 0
+    for i in range(0, len(text), size):
+        n += 1
+        pages[n] = text[i:i + size].strip()
+    return pages
+
+
+def extract_docx(file_path: Path) -> tuple[dict[int, str], int]:
+    """Extract text from a Word .docx (paragraphs + tables). Returns {page, text} + count."""
+    from docx import Document
+    doc = Document(str(file_path))
+    blocks: list[str] = []
+    for p in doc.paragraphs:
+        t = p.text.strip()
+        if t:
+            blocks.append(t)
+    for table in doc.tables:
+        for row in table.rows:
+            cells = [c.text.strip() for c in row.cells]
+            line = " | ".join(cells)
+            if line.strip():
+                blocks.append(line)
+    pages = _split_text_to_pages("\n\n".join(blocks), size=1800)
+    return pages, len(pages)
+
+
+def extract_xlsx(file_path: Path) -> tuple[dict[int, str], int]:
+    """Extract text from an Excel .xlsx (one synthetic page per worksheet)."""
+    import openpyxl
+    wb = openpyxl.load_workbook(str(file_path), read_only=True, data_only=True)
+    pages: dict[int, str] = {}
+    n = 0
+    for ws in wb.worksheets:
+        rows = []
+        for r in ws.iter_rows(values_only=True):
+            cells = ["" if c is None else str(c) for c in r]
+            line = "\t".join(cells).strip()
+            if line:
+                rows.append(line)
+        text = f"Sheet: {ws.title}\n" + "\n".join(rows)
+        if text.strip():
+            n += 1
+            pages[n] = text
+    return pages, n
+
+
+def extract_pptx(file_path: Path) -> tuple[dict[int, str], int]:
+    """Extract text from a PowerPoint .pptx (one synthetic page per slide)."""
+    from pptx import Presentation
+    prs = Presentation(str(file_path))
+    pages: dict[int, str] = {}
+    n = 0
+    for slide in prs.slides:
+        texts: list[str] = []
+        for shape in slide.shapes:
+            if shape.has_text_frame:
+                for para in shape.text_frame.paragraphs:
+                    t = para.text.strip()
+                    if t:
+                        texts.append(t)
+            if shape.has_table:
+                for row in shape.table.rows:
+                    cells = [c.text.strip() for c in row.cells]
+                    line = " | ".join(cells)
+                    if line.strip():
+                        texts.append(line)
+        text = "\n".join(texts)
+        if text.strip():
+            n += 1
+            pages[n] = text
+    return pages, n
+
+
+def extract_document(file_path: Path, PdfReader) -> tuple[dict[int, str], int]:
+    """Dispatch extraction by file extension. Returns {page, text} + page count."""
+    ext = file_path.suffix.lower()
+    if ext == ".pdf":
+        return extract_pdf(file_path, PdfReader)
+    if ext == ".docx":
+        return extract_docx(file_path)
+    if ext == ".xlsx":
+        return extract_xlsx(file_path)
+    if ext == ".pptx":
+        return extract_pptx(file_path)
+    raise ValueError(f"Unsupported file type: {ext}")
 
 
 # ── doc_id Processing ────────────────────────────────────────────────────────
@@ -211,11 +308,11 @@ def write_document(
     PdfReader,
     doc_id: str,
 ) -> dict:
-    """Write meta.json / structure.json / pages/{n}.txt for a single PDF. Returns index.json entry."""
+    """Write meta.json / structure.json / pages/{n}.txt for a single document. Returns index.json entry."""
     print(f"\n  [FILE] {pdf_path.name}  ->  doc_id: {doc_id}")
 
-    # 1. Extract PDF text
-    pages, page_count = extract_pages(pdf_path, PdfReader)
+    # 1. Extract document text (PDF / DOCX / XLSX / PPTX)
+    pages, page_count = extract_document(pdf_path, PdfReader)
     text_pages = sum(1 for t in pages.values() if t)
     print(f"     Total {page_count} pages, {text_pages} pages with text")
 
@@ -240,7 +337,7 @@ def write_document(
     meta_payload = {
         "doc_name":        doc_name,
         "doc_description": index_data.get("summary", ""),
-        "type":            "pdf",
+        "type":            pdf_path.suffix.lower().lstrip("."),
         "page_count":      page_count,
         "status":          "completed",
         "created":         datetime.now(timezone.utc).isoformat(),
@@ -304,14 +401,17 @@ def main() -> None:
         print(f"[ERROR] Directory does not exist: {FILES_DIR}", file=sys.stderr)
         sys.exit(1)
 
-    pdf_files = sorted(FILES_DIR.glob("*.pdf"))
-    if not pdf_files:
-        print(f"[WARN] No PDF files found in {FILES_DIR}")
+    doc_files = sorted(
+        p for p in FILES_DIR.iterdir()
+        if p.is_file() and p.suffix.lower() in ALLOWED_EXT
+    )
+    if not doc_files:
+        print(f"[WARN] No supported files found in {FILES_DIR} (expected: {', '.join(sorted(ALLOWED_EXT))})")
         sys.exit(0)
 
     print(f"\n[DIR] Scanning directory: {FILES_DIR}")
-    print(f"   Found {len(pdf_files)} PDF file(s):")
-    for p in pdf_files:
+    print(f"   Found {len(doc_files)} document file(s):")
+    for p in doc_files:
         has_index = p.with_suffix(".json").exists()
         marker = "  [i]" if has_index else "  ·"
         print(f"{marker} {p.name}" + (" [has index]" if has_index else ""))
@@ -331,7 +431,7 @@ def main() -> None:
     used_ids: list[str] = []
     all_chunks: list[dict] = []
 
-    for pdf_path in pdf_files:
+    for pdf_path in doc_files:
         doc_id = sanitize_doc_id(pdf_path.stem)
         if doc_id in used_ids:
             doc_id = f"{doc_id}_{len(used_ids)}"

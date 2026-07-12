@@ -10,7 +10,7 @@ A retrieval-augmented chat agent on EdgeOne Makers — answers questions over a 
 
 ## Overview
 
-A working enterprise-style RAG template: drop PDFs into `public/prepare-rag/files/`, run one script, and the agent answers grounded questions with page-level citations. Retrieval uses a **local Chroma vector store** with **free, offline embeddings** (`fastembed` + `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`) — no external vector DB service and no embedding API key required, so the template stays readable and costs nothing to run. Replace the embedder/store with your own and the rest of the pipeline keeps working.
+A working enterprise-style RAG template: drop documents (PDF, DOCX, XLSX, PPTX) into `public/prepare-rag/files/`, run one script, and the agent answers grounded questions with page-level citations. Retrieval uses a **local Chroma vector store** with **free, offline embeddings** (`fastembed` + `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`) — no external vector DB service and no embedding API key required, so the template stays readable and costs nothing to run. Replace the embedder/store with your own and the rest of the pipeline keeps working.
 
 - **Citation-backed answers** — every claim links back to a specific document + page via `search_document` and `fetch_pages` tools.
 - **Streaming + tool visibility** — the UI surfaces `tool-input-available` / `tool-output-available` events so users see which sources the agent reads, in real time.
@@ -97,7 +97,7 @@ rag-agent/
 
 End-to-end:
 
-1. **Build the knowledge base (offline)** — `prepare_rag_data.py` reads PDFs from `public/prepare-rag/files/`, writes `agents/_data/{docId}/meta.json` + `pages/{n}.txt`, and chunks + embeds the text into an embedded Chroma collection (`agents/_data/chroma/`) using local `fastembed` embeddings. `agents/_data/index.json` is the document manifest. The embedding model (`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`, ~470 MB) downloads once and is cached; subsequent runs are fully offline.
+1. **Build the knowledge base (offline)** — `prepare_rag_data.py` reads documents (`.pdf`, `.docx`, `.xlsx`, `.pptx`) from `public/prepare-rag/files/`, writes `agents/_data/{docId}/meta.json` + `pages/{n}.txt`, and chunks + embeds the text into an embedded Chroma collection (`agents/_data/chroma/`) using local `fastembed` embeddings. `agents/_data/index.json` is the document manifest. The embedding model (`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`, ~470 MB) downloads once and is cached; subsequent runs are fully offline.
 2. **Request entry** — `POST /chat` (handled by `agents/chat/index.py`) pulls history via `context.store.openai_session(conversation_id)` and starts an OpenAI Agents SDK run for the `_agent.py` agent definition.
  3. **LLM ↔ tools loop** — the agent has access to two tools defined in `_tools.py`:
     - `search_document(query, doc_id)` — embeds the query locally and returns the most semantically similar chunks (ranked by cosine similarity) from the Chroma vector store for that document
