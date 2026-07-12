@@ -20,10 +20,10 @@ function getOrCreateConversationId(): string {
 export default function App() {
   return (
     <I18nProvider>
-      <LangToggle />
+      {/* <LangToggle /> */}
       <AppInner />
-      <GitHubLink />
-      <DeployLink />
+      {/* <GitHubLink /> */}
+      {/* <DeployLink /> */}
     </I18nProvider>
   );
 }
@@ -38,7 +38,7 @@ function AppInner() {
         <HeroSection />
 
         <div className="kb-mini">
-          <KnowledgeBaseSummary conversationId={conversationIdRef.current} />
+          {/* <KnowledgeBaseSummary conversationId={conversationIdRef.current} /> */}
         </div>
       </div>
 

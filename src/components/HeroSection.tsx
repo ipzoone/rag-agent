@@ -1,4 +1,5 @@
 import "./HeroSection.css";
+import codepolitanImg from "../codepolitan.png";
 
 export default function HeroSection() {
   return (
@@ -53,13 +54,11 @@ export default function HeroSection() {
           <span className="hero-cross c4">&#10011;</span>
 
           <div className="hero-visual-panel">
-            <div className="hero-visual-placeholder">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.4">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <polyline points="21 15 16 10 5 21" />
-              </svg>
-            </div>
+            <img
+              className="hero-visual-img"
+              src={codepolitanImg}
+              alt="Codepolitan"
+            />
           </div>
         </div>
       </section>

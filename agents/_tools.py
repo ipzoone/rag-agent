@@ -11,10 +11,10 @@ from agents import function_tool
 from ._loader import (
     list_documents,
     get_document_meta,
-    get_document_structure,
     get_page_content,
     parse_page_range,
 )
+from ._vector import semantic_search
 from ._logger import create_logger
 
 logger = create_logger("tools")
@@ -73,34 +73,35 @@ def search_document(
             "error": f"Document '{doc_id}' not found.",
         }, ensure_ascii=False)
 
-    structure = get_document_structure(doc_id)
-
-    # When no tree-structure index exists, instruct to fetch all pages for small docs
-    if not structure:
-        page_count = meta.get("page_count", 0)
-        suggested_pages = f"1-{page_count}" if page_count <= 20 else "1-20"
+    # Semantic retrieval: find the most relevant chunks for the query.
+    results = semantic_search(query, doc_id=doc_id, top_k=8)
+    if not results:
         return json.dumps({
-            "docId": doc_id,
-            "query": query,
-            "meta": meta,
-            "structure": None,
-            "instruction": (
-                f"This document has no tree-structure index but contains {page_count} pages. "
-                f"Please call fetchPages with pages=\"{suggested_pages}\" to retrieve the content, "
-                "then answer the user's question based on the retrieved text."
+            "error": (
+                f"No relevant chunks found in '{doc_id}'. The vector store may be empty — "
+                "run `npm run prepare-rag` to rebuild it, or pick another document."
             ),
         }, ensure_ascii=False)
 
+    doc_name = meta.get("doc_name", doc_id)
     return json.dumps({
         "docId": doc_id,
         "query": query,
-        "meta": meta,
-        "structure": structure,
         "instruction": (
-            "Analyze the document structure above, find sections most relevant to the user's question, "
-            "determine the page range (start_index to end_index), "
-            "then call fetchPages to retrieve the original text and answer based on it."
+            "The chunks below are the most semantically relevant passages to the user's question "
+            "(ranked by similarity, lower score = more similar). Base your answer on these chunks and "
+            "cite them by document name + page. If a chunk is insufficient, you may also call "
+            "fetch_pages with its page number to read the full page text."
         ),
+        "chunks": [
+            {
+                "page": r["page"],
+                "chunkIndex": r["chunk_index"],
+                "score": r["score"],
+                "text": r["text"],
+            }
+            for r in results
+        ],
     }, ensure_ascii=False)
 
 

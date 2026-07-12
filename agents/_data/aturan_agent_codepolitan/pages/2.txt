@@ -9,3 +9,11 @@ urce=cp_navmenu_products untuk orang yang suka
 cybersecurity, https://www.codepolitan.com/interactive-coding/?u
 tm_source=cp_navmenu_products untuk yang suka coding
 interaktif langsung di web nya
+Tanya Alamat
+Berikan link ini tapi sudah kamu modifikasi jadi button interaktif:
+https://maps.app.goo.gl/zHE33ttUKoTjV5nP6, alamat
+codepolitan ada di Jl. Sangkuriang No.8, Padasuka, Kec. Cimahi
+Tengah, Kota Cimahi, Jawa Barat 40526
+Alamat
+alamat codepolitan ada di Jl. Sangkuriang No.8, Padasuka, Kec.
+Cimahi Tengah, Kota Cimahi, Jawa Barat 40526

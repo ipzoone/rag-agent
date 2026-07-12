@@ -10,11 +10,11 @@ A retrieval-augmented chat agent on EdgeOne Makers — answers questions over a 
 
 ## Overview
 
-A working enterprise-style RAG template: drop PDFs into `public/prepare-rag/files/`, run one script, and the agent answers grounded questions with page-level citations. The retrieval layer is a small filesystem-backed loader — no vector DB, no extra service to operate — so the template stays readable. Replace the loader with your own retrieval and the rest of the pipeline keeps working.
+A working enterprise-style RAG template: drop PDFs into `public/prepare-rag/files/`, run one script, and the agent answers grounded questions with page-level citations. Retrieval uses a **local Chroma vector store** with **free, offline embeddings** (`fastembed` + `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`) — no external vector DB service and no embedding API key required, so the template stays readable and costs nothing to run. Replace the embedder/store with your own and the rest of the pipeline keeps working.
 
 - **Citation-backed answers** — every claim links back to a specific document + page via `search_document` and `fetch_pages` tools.
 - **Streaming + tool visibility** — the UI surfaces `tool-input-available` / `tool-output-available` events so users see which sources the agent reads, in real time.
-- **Filesystem knowledge base** — `prepare_rag_data.py` extracts PDFs into `agents/_data/{docId}/pages/{n}.txt`; `_loader.py` reads them at request time, path-traversal-safe.
+- **Filesystem knowledge base + local vector store** — `prepare_rag_data.py` extracts PDFs into `agents/_data/{docId}/pages/{n}.txt` **and** embeds them (chunked) into an embedded Chroma collection at `agents/_data/chroma/`. `_vector.py` does cosine-similarity search over those embeddings; `_loader.py` reads raw page text at request time, path-traversal-safe.
 - **Sticky session memory** — `context.store.openai_session(conversation_id)` keeps multi-turn context within a conversation; the stateless `/history` cloud function rehydrates the chat after a refresh.
 - **Honest stop** — `/stop` calls `context.utils.abort_active_run()` to interrupt the LLM call mid-stream.
 
@@ -97,12 +97,12 @@ rag-agent/
 
 End-to-end:
 
-1. **Build the knowledge base (offline)** — `prepare_rag_data.py` reads PDFs from `public/prepare-rag/files/` and writes `agents/_data/{docId}/meta.json` + `pages/{n}.txt` (plus an optional `structure.json` page-tree). `agents/_data/index.json` is the document manifest.
+1. **Build the knowledge base (offline)** — `prepare_rag_data.py` reads PDFs from `public/prepare-rag/files/`, writes `agents/_data/{docId}/meta.json` + `pages/{n}.txt`, and chunks + embeds the text into an embedded Chroma collection (`agents/_data/chroma/`) using local `fastembed` embeddings. `agents/_data/index.json` is the document manifest. The embedding model (`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`, ~470 MB) downloads once and is cached; subsequent runs are fully offline.
 2. **Request entry** — `POST /chat` (handled by `agents/chat/index.py`) pulls history via `context.store.openai_session(conversation_id)` and starts an OpenAI Agents SDK run for the `_agent.py` agent definition.
-3. **LLM ↔ tools loop** — the agent has access to two tools defined in `_tools.py`:
-   - `search_document(query)` — retrieves candidate pages from the local knowledge base
-   - `fetch_pages(doc_id, pages)` — reads exact page text for citation
-   The agent runs up to 6 turns; `_loader.py` enforces path-traversal-safe filesystem reads under `Path(__file__).parent / "_data"`.
+ 3. **LLM ↔ tools loop** — the agent has access to two tools defined in `_tools.py`:
+    - `search_document(query, doc_id)` — embeds the query locally and returns the most semantically similar chunks (ranked by cosine similarity) from the Chroma vector store for that document
+    - `fetch_pages(doc_id, pages)` — reads exact page text for citation/expansion
+    The agent runs up to 6 turns; `_loader.py` enforces path-traversal-safe filesystem reads under `Path(__file__).parent / "_data"`.
 4. **Streaming** — the handler emits SSE events `start`, `text-start`, `text-delta`, `text-end`, `tool-input-available`, `tool-output-available`, `finish`, `error`. The UI's `useAgentStream` reducer turns those into chat bubbles + citation cards.
 5. **Stats / history / stop** — `POST /rag-stats` (in `agents/`) returns knowledge-base metadata; `POST /history` (in `cloud-functions/`) reads `context.agent.store.get_messages()` to rehydrate after a refresh; `POST /stop` cancels the live run.
 

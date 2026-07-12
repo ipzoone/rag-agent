@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-07T04:14:24.501850+00:00",
+  "generated_at": "2026-07-12T14:57:44.720812+00:00",
   "documents": [
     {
       "docId": "aturan_agent_codepolitan",
@@ -9,14 +9,15 @@
         "type": "pdf",
         "page_count": 2,
         "status": "completed",
-        "created": "2026-07-07T04:14:24.307139+00:00"
+        "created": "2026-07-12T14:57:39.784496+00:00"
       },
       "hasStructure": false,
       "pages": 2,
       "metaBytes": 179,
       "structureBytes": 0,
-      "pageBytes": 2006,
-      "totalBytes": 2185
+      "pageBytes": 2689,
+      "totalBytes": 2868,
+      "chunks": 3
     },
     {
       "docId": "codepolitan_rag_dataset",
@@ -26,14 +27,15 @@
         "type": "pdf",
         "page_count": 7,
         "status": "completed",
-        "created": "2026-07-07T04:14:24.352456+00:00"
+        "created": "2026-07-12T14:57:39.984161+00:00"
       },
       "hasStructure": false,
       "pages": 7,
       "metaBytes": 178,
       "structureBytes": 0,
       "pageBytes": 7544,
-      "totalBytes": 7722
+      "totalBytes": 7722,
+      "chunks": 7
     },
     {
       "docId": "for_company_dataset",
@@ -43,14 +45,15 @@
         "type": "pdf",
         "page_count": 12,
         "status": "completed",
-        "created": "2026-07-07T04:14:24.431901+00:00"
+        "created": "2026-07-12T14:57:40.055074+00:00"
       },
       "hasStructure": false,
       "pages": 12,
       "metaBytes": 175,
       "structureBytes": 0,
       "pageBytes": 13771,
-      "totalBytes": 13946
+      "totalBytes": 13946,
+      "chunks": 12
     },
     {
       "docId": "for_school_dataset",
@@ -60,14 +63,15 @@
         "type": "pdf",
         "page_count": 6,
         "status": "completed",
-        "created": "2026-07-07T04:14:24.479772+00:00"
+        "created": "2026-07-12T14:57:40.103857+00:00"
       },
       "hasStructure": false,
       "pages": 6,
       "metaBytes": 173,
       "structureBytes": 0,
       "pageBytes": 6400,
-      "totalBytes": 6573
+      "totalBytes": 6573,
+      "chunks": 6
     },
     {
       "docId": "program_dataset",
@@ -77,14 +81,15 @@
         "type": "pdf",
         "page_count": 1,
         "status": "completed",
-        "created": "2026-07-07T04:14:24.490170+00:00"
+        "created": "2026-07-12T14:57:40.118620+00:00"
       },
       "hasStructure": false,
       "pages": 1,
       "metaBytes": 170,
       "structureBytes": 0,
       "pageBytes": 1466,
-      "totalBytes": 1636
+      "totalBytes": 1636,
+      "chunks": 1
     },
     {
       "docId": "program_vibecoding_dataset",
@@ -94,14 +99,15 @@
         "type": "pdf",
         "page_count": 1,
         "status": "completed",
-        "created": "2026-07-07T04:14:24.501049+00:00"
+        "created": "2026-07-12T14:57:40.126725+00:00"
       },
       "hasStructure": false,
       "pages": 1,
       "metaBytes": 181,
       "structureBytes": 0,
       "pageBytes": 1466,
-      "totalBytes": 1647
+      "totalBytes": 1647,
+      "chunks": 1
     }
   ]
 }

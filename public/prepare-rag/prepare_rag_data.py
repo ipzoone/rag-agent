@@ -38,11 +38,21 @@ Execution flow:
 """
 
 import json
+import os
 import re
 import shutil
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+# Reconfigure stdout/stderr to UTF-8 so the pretty box-drawing output does not
+# crash on consoles with a non-UTF-8 encoding (e.g. Windows cp1252).
+try:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
@@ -53,6 +63,13 @@ FILES_DIR = Path(__file__).parent / "files"
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 AGENTS_DIR = PROJECT_ROOT / "agents"
 RAG_OUT_DIR = AGENTS_DIR / "_data"
+
+# ── Chunking + Vector Store (Chroma, embedded) ──────────────────────────────
+
+CHUNK_TOKENS = int(os.getenv("RAG_CHUNK_TOKENS", "500"))
+OVERLAP_TOKENS = int(os.getenv("RAG_OVERLAP_TOKENS", "50"))
+LOCAL_EMBED_MODEL = os.getenv("LOCAL_EMBED_MODEL", "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+CHROMA_COLLECTION = "rag_chunks"
 
 
 # ── PDF Text Extraction ──────────────────────────────────────────────────────
@@ -95,6 +112,95 @@ def sanitize_doc_id(name: str) -> str:
     s = re.sub(r"[^\w\-]", "", s)
     s = s.strip("_")
     return s or "doc"
+
+
+# ── Text Chunking ─────────────────────────────────────────────────────────────
+
+_tok_enc = None
+
+
+def _token_encoder():
+    """Lazily load the tiktoken encoder (cl100k_base)."""
+    global _tok_enc
+    if _tok_enc is None:
+        import tiktoken
+        _tok_enc = tiktoken.get_encoding("cl100k_base")
+    return _tok_enc
+
+
+def chunk_page(text: str, doc_id: str, page_num: int, doc_name: str) -> list[dict]:
+    """Split a page's text into ~CHUNK_TOKENS token chunks with overlap.
+
+    Returns a list of chunk dicts ready for the vector store.
+    """
+    enc = _token_encoder()
+    tokens = enc.encode(text)
+    chunks: list[dict] = []
+    n = len(tokens)
+    if n == 0:
+        return chunks
+    start = 0
+    idx = 0
+    while start < n:
+        end = min(start + CHUNK_TOKENS, n)
+        piece = enc.decode(tokens[start:end]).strip()
+        if piece:
+            chunks.append({
+                "id": f"{doc_id}__p{page_num}__c{idx}",
+                "text": piece,
+                "doc_id": doc_id,
+                "doc_name": doc_name,
+                "page": page_num,
+                "chunk_index": idx,
+            })
+        idx += 1
+        if end == n:
+            break
+        start = end - OVERLAP_TOKENS
+    return chunks
+
+
+# ── Vector Store Build (Chroma, embedded, local embeddings) ──────────────────
+
+def build_vector_store(all_chunks: list[dict]) -> int:
+    """Embed all chunks locally and persist them into an embedded Chroma store.
+
+    Fully offline after the first model download. Returns chunk count.
+    """
+    if not all_chunks:
+        print("    [VEC] No chunks to embed, skipping vector store.")
+        return 0
+
+    print(f"\n  [VEC] Embedding {len(all_chunks)} chunks with model {LOCAL_EMBED_MODEL} ...")
+    from fastembed import TextEmbedding
+    import chromadb
+
+    model = TextEmbedding(model_name=LOCAL_EMBED_MODEL)
+    texts = [c["text"] for c in all_chunks]
+    embeddings = [v.tolist() for v in model.embed(texts, batch_size=256, parallel=0)]
+
+    chroma_path = RAG_OUT_DIR / "chroma"
+    client = chromadb.PersistentClient(path=str(chroma_path))
+    collection = client.get_or_create_collection(
+        name=CHROMA_COLLECTION,
+        metadata={"hnsw:space": "cosine"},
+    )
+    collection.add(
+        ids=[c["id"] for c in all_chunks],
+        embeddings=embeddings,
+        documents=texts,
+        metadatas=[
+            {
+                "doc_id": c["doc_id"],
+                "doc_name": c.get("doc_name", ""),
+                "page": c["page"],
+                "chunk_index": c["chunk_index"],
+            }
+            for c in all_chunks
+        ],
+    )
+    print(f"  [VEC] Stored {len(all_chunks)} chunks in Chroma @ {chroma_path}")
+    return len(all_chunks)
 
 
 # ── Write Single Document ────────────────────────────────────────────────────
@@ -182,7 +288,7 @@ def write_document(
         "structureBytes": structure_bytes,
         "pageBytes":      page_bytes,
         "totalBytes":     total_bytes,
-    }
+    }, pages, doc_name
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
@@ -222,6 +328,7 @@ def main() -> None:
     print("\n── Writing document content " + "─" * 33)
     index_entries: list[dict] = []
     used_ids: list[str] = []
+    all_chunks: list[dict] = []
 
     for pdf_path in pdf_files:
         doc_id = sanitize_doc_id(pdf_path.stem)
@@ -229,8 +336,25 @@ def main() -> None:
             doc_id = f"{doc_id}_{len(used_ids)}"
         used_ids.append(doc_id)
 
-        entry = write_document(pdf_path, PdfReader, doc_id)
+        entry, pages, doc_name = write_document(pdf_path, PdfReader, doc_id)
         index_entries.append(entry)
+
+        # Build semantic chunks from extracted page text
+        doc_chunks = []
+        for page_num, text in pages.items():
+            doc_chunks.extend(chunk_page(text, doc_id, page_num, doc_name))
+        all_chunks.extend(doc_chunks)
+        print(f"     Chunks: {len(doc_chunks)} (from {len([t for t in pages.values() if t])} text pages)")
+
+    # Build embedded vector store (local embeddings — free, offline)
+    total_chunks = build_vector_store(all_chunks)
+
+    # Annotate index entries with per-document chunk counts
+    chunk_counts: dict[str, int] = {}
+    for c in all_chunks:
+        chunk_counts[c["doc_id"]] = chunk_counts.get(c["doc_id"], 0) + 1
+    for e in index_entries:
+        e["chunks"] = chunk_counts.get(e["docId"], 0)
 
     # Summary statistics
     total_bytes = sum(e["totalBytes"] for e in index_entries)
@@ -248,6 +372,7 @@ def main() -> None:
 
     print(f"\n── Summary " + "─" * 48)
     print(f"   Documents:    {len(pdf_files)}")
+    print(f"   Chunks:       {total_chunks}  (embedded locally, stored in Chroma)")
     print(f"   Total size:   {total_bytes / 1024:.1f} KB  ({total_bytes / 1024 / 1024:.2f} MB)")
     print(f"   Output dir:   {RAG_OUT_DIR.relative_to(PROJECT_ROOT)}")
     print(f"   Manifest:     {index_path.relative_to(PROJECT_ROOT)}")
