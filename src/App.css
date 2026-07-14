@@ -179,6 +179,23 @@
   color: #111;
 }
 
+.widget-admin-link {
+  margin-left: 12px;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #114;
+  text-decoration: none;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.widget-admin-link:hover {
+  color: #0b6b5e;
+  border-color: #0b6b5e;
+}
+
 .widget-close-btn {
   width: 32px;
   height: 32px;

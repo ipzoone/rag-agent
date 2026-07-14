@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-12T18:10:57.003062+00:00",
+  "generated_at": "2026-07-12T20:52:12.669208+00:00",
   "documents": [
     {
       "docId": "aturan_agent_codepolitan",
@@ -9,7 +9,7 @@
         "type": "pdf",
         "page_count": 2,
         "status": "completed",
-        "created": "2026-07-12T18:10:43.605108+00:00"
+        "created": "2026-07-12T20:52:02.667878+00:00"
       },
       "hasStructure": false,
       "pages": 2,
@@ -27,7 +27,7 @@
         "type": "pdf",
         "page_count": 7,
         "status": "completed",
-        "created": "2026-07-12T18:10:43.899958+00:00"
+        "created": "2026-07-12T20:52:03.304584+00:00"
       },
       "hasStructure": false,
       "pages": 7,
@@ -45,7 +45,7 @@
         "type": "pdf",
         "page_count": 12,
         "status": "completed",
-        "created": "2026-07-12T18:10:43.982747+00:00"
+        "created": "2026-07-12T20:52:03.572969+00:00"
       },
       "hasStructure": false,
       "pages": 12,
@@ -63,7 +63,7 @@
         "type": "pdf",
         "page_count": 6,
         "status": "completed",
-        "created": "2026-07-12T18:10:44.031383+00:00"
+        "created": "2026-07-12T20:52:03.718875+00:00"
       },
       "hasStructure": false,
       "pages": 6,
@@ -81,7 +81,7 @@
         "type": "pdf",
         "page_count": 1,
         "status": "completed",
-        "created": "2026-07-12T18:10:44.045745+00:00"
+        "created": "2026-07-12T20:52:03.756870+00:00"
       },
       "hasStructure": false,
       "pages": 1,
@@ -99,7 +99,7 @@
         "type": "pdf",
         "page_count": 1,
         "status": "completed",
-        "created": "2026-07-12T18:10:44.063563+00:00"
+        "created": "2026-07-12T20:52:03.784870+00:00"
       },
       "hasStructure": false,
       "pages": 1,
@@ -107,6 +107,24 @@
       "structureBytes": 0,
       "pageBytes": 1466,
       "totalBytes": 1647,
+      "chunks": 1
+    },
+    {
+      "docId": "ATURAN_TAMBAHAN_CHAT_ASSISTENT",
+      "meta": {
+        "doc_name": "ATURAN TAMBAHAN CHAT ASSISTENT",
+        "doc_description": "",
+        "type": "docx",
+        "page_count": 1,
+        "status": "completed",
+        "created": "2026-07-12T20:52:04.386401+00:00"
+      },
+      "hasStructure": false,
+      "pages": 1,
+      "metaBytes": 186,
+      "structureBytes": 0,
+      "pageBytes": 394,
+      "totalBytes": 580,
       "chunks": 1
     }
   ]

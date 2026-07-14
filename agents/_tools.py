@@ -20,7 +20,7 @@ from ._logger import create_logger
 logger = create_logger("tools")
 
 
-@function_tool
+@function_tool(strict_mode=False)
 def search_document(
     query: Annotated[str, "User's search query"],
     doc_id: Annotated[str, "Document ID. Pass empty string only as a fallback to re-list documents — the system prompt already includes the catalog."] = "",
@@ -105,7 +105,7 @@ def search_document(
     }, ensure_ascii=False)
 
 
-@function_tool
+@function_tool(strict_mode=False)
 def fetch_pages(
     doc_id: Annotated[str, "Document ID"],
     pages: Annotated[str, "Page range, e.g. '5-7,12,15-16'. Max 20 pages per call."],

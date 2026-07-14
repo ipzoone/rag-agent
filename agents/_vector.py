@@ -13,6 +13,7 @@ Collection layout (`agents/_data/chroma/`):
     metadata   : {doc_id, doc_name, page, chunk_index}
 """
 
+import time
 from pathlib import Path
 from typing import Any, List
 
@@ -28,25 +29,64 @@ COLLECTION = "rag_chunks"
 
 _client = None
 _collection = None
+_watermark = None
+
+
+def _data_watermark() -> float:
+    """Max mtime of the data dir + index.json; changes when the KB is rebuilt."""
+    w = 0.0
+    try:
+        if RAG_ROOT.exists():
+            w = RAG_ROOT.stat().st_mtime
+        idx = RAG_ROOT / "index.json"
+        if idx.exists():
+            w = max(w, idx.stat().st_mtime)
+    except Exception:
+        return 0.0
+    return w
 
 
 def _get_collection():
-    """Lazily open (or create) the embedded Chroma collection."""
-    global _client, _collection
-    if _collection is None:
-        try:
-            import chromadb
-        except ImportError:
-            logger.error("chromadb not installed. Run: pip install -r requirements.txt")
-            raise
-        CHROMA_DIR.mkdir(parents=True, exist_ok=True)
-        _client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-        _collection = _client.get_or_create_collection(
-            name=COLLECTION,
-            metadata={"hnsw:space": "cosine"},
-        )
-        logger.log(f"Chroma collection '{COLLECTION}' opened (dim={embed_dim()})")
+    """Lazily open (or create) the embedded Chroma collection.
+
+    The collection is re-opened whenever the data directory's mtime changes
+    (e.g. after /admin-rebuild regenerates agents/_data), so a long-lived
+    agent process always queries the latest vectors without a restart.
+    """
+    global _client, _collection, _watermark
+    w = _data_watermark()
+    if _collection is not None and w == _watermark:
+        return _collection
+
+    try:
+        import chromadb
+    except ImportError:
+        logger.error("chromadb not installed. Run: pip install -r requirements.txt")
+        raise
+
+    CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+    _client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+    _collection = _client.get_or_create_collection(
+        name=COLLECTION,
+        metadata={"hnsw:space": "cosine"},
+    )
+    _watermark = w
+    logger.log(f"Chroma collection '{COLLECTION}' opened (dim={embed_dim()})")
     return _collection
+
+
+def _dispose() -> None:
+    """Drop the in-memory Chroma client.
+
+    Called by /admin-rebuild before the prepare pipeline wipes agents/_data,
+    so the parent process releases its open file handles (otherwise rmtree
+    can fail on Windows, where the directory is locked). The next query
+    re-opens the collection via the mtime watermark in _get_collection().
+    """
+    global _client, _collection, _watermark
+    _client = None
+    _collection = None
+    _watermark = None
 
 
 def semantic_search(query: str, doc_id: str = "", top_k: int = 8) -> List[dict]:

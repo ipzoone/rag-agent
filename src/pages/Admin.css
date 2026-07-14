@@ -1,0 +1,246 @@
+.admin-shell {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+  color: var(--text-primary);
+}
+
+.admin-shell h1 {
+  font-size: 22px;
+  margin: 0 0 4px;
+}
+
+.admin-sub {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: 0 0 14px;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-actions-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.admin-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+.admin-card h2 {
+  font-size: 15px;
+  margin: 0 0 12px;
+}
+
+.admin-upload-btn,
+.admin-rebuild {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent, #2f9e8f);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.admin-rebuild {
+  background: var(--accent-2, #3b82f6);
+}
+
+.admin-upload-btn:hover,
+.admin-rebuild:hover {
+  opacity: 0.9;
+}
+
+.admin-rebuild:disabled,
+.admin-upload-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 13px;
+}
+
+.admin-file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-file-name em {
+  color: var(--text-secondary);
+  font-style: normal;
+  font-size: 11px;
+}
+
+.admin-file-size {
+  color: var(--text-secondary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.admin-file-tag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.18));
+  color: var(--text-secondary);
+}
+
+.admin-file-tag.public {
+  color: #2f9e8f;
+  border-color: rgba(47, 158, 143, 0.4);
+}
+
+.admin-file-nodel {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.admin-del {
+  background: transparent;
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.admin-del:hover {
+  background: rgba(255, 107, 107, 0.12);
+}
+
+.admin-message {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.admin-ok {
+  background: rgba(47, 158, 143, 0.15);
+  border: 1px solid rgba(47, 158, 143, 0.4);
+}
+
+.admin-err {
+  background: rgba(255, 107, 107, 0.12);
+  border: 1px solid rgba(255, 107, 107, 0.4);
+}
+
+.admin-info {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.admin-empty {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: 0;
+}
+
+.admin-log {
+  background: #0b1a20;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 12px;
+  max-height: 280px;
+  overflow: auto;
+  white-space: pre-wrap;
+  color: #cfe8e2;
+}
+
+.admin-back {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.admin-back:hover {
+  color: var(--accent, #2f9e8f);
+}
+
+/* Login screen */
+.admin-login {
+  max-width: 360px;
+  margin: 80px auto 0;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  padding: 28px;
+}
+
+.admin-login h1 {
+  margin: 0 0 4px;
+}
+
+.admin-login input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #0b1a20;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-size: 14px;
+  margin: 12px 0;
+}
+
+.admin-login button {
+  width: 100%;
+  background: var(--accent, #2f9e8f);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.admin-error {
+  color: #ff6b6b;
+  font-size: 13px;
+  margin-bottom: 8px;
+}

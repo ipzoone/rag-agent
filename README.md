@@ -64,6 +64,14 @@ rag-agent/
 │   ├── chat/_stream.py             # SSE streaming utilities (private)
 │   ├── stop/index.py               # POST /stop — abort active agent run
 │   ├── rag-stats/index.py          # POST /rag-stats — knowledge base stats
+│   ├── admin-login/index.py        # POST /admin-login — password → token
+│   ├── admin-files/index.py        # POST /admin-files — list KB sources + index
+│   ├── admin-upload/index.py       # POST /admin-upload — upload a doc (base64)
+│   ├── admin-delete/index.py       # POST /admin-delete — remove a source doc
+│   ├── admin-rebuild/index.py      # POST /admin-rebuild — run prepare-rag
+│   ├── _admin_auth.py              # Admin auth + path helpers (private)
+│   ├── _prepare_rag.py             # Canonical KB builder (private, sandbox-safe)
+│   ├── _uploads/                   # Documents uploaded via the admin panel
 │   ├── _agent.py                   # RAG Agent definition (private)
 │   ├── _tools.py                   # search_document, fetch_pages tools (private)
 │   ├── _loader.py                  # Filesystem knowledge base reader (private)
@@ -79,6 +87,8 @@ rag-agent/
 │   └── files/                      # Drop your source PDFs here
 ├── src/                             # React + Vite frontend
 │   ├── App.tsx                     # Root component
+│   ├── adminApi.ts                 # Admin panel API client
+│   ├── pages/Admin.tsx            # Admin dashboard (/#/admin)
 │   ├── api.ts                      # SSE stream client
 │   └── components/
 │       ├── RagChat.tsx             # Chat UI with streaming + tool visibility
@@ -105,6 +115,32 @@ End-to-end:
     The agent runs up to 6 turns; `_loader.py` enforces path-traversal-safe filesystem reads under `Path(__file__).parent / "_data"`.
 4. **Streaming** — the handler emits SSE events `start`, `text-start`, `text-delta`, `text-end`, `tool-input-available`, `tool-output-available`, `finish`, `error`. The UI's `useAgentStream` reducer turns those into chat bubbles + citation cards.
 5. **Stats / history / stop** — `POST /rag-stats` (in `agents/`) returns knowledge-base metadata; `POST /history` (in `cloud-functions/`) reads `context.agent.store.get_messages()` to rehydrate after a refresh; `POST /stop` cancels the live run.
+
+## Admin Panel (manage the knowledge base from the dashboard)
+
+Open `/#/admin` in the browser. It is a password-gated dashboard that lets you grow the
+agent's vector store without touching the build pipeline manually:
+
+- **Login** — `POST /admin-login` verifies `ADMIN_PASSWORD` and returns a token (HMAC of the
+  password under `ADMIN_SECRET`). The token is stored in `localStorage` and sent with every
+  protected call. If `ADMIN_PASSWORD` is empty, the panel is disabled.
+- **Upload** — `POST /admin-upload` accepts a document as base64 (`{token, filename, data}`),
+  validates the extension (`.pdf/.docx/.xlsx/.pptx`), strips any path components, and writes it
+  into `public/prepare-rag/files/`.
+- **List / Delete** — `POST /admin-files` and `POST /admin-delete` show and remove source files.
+- **Rebuild** — `POST /admin-rebuild` calls the canonical builder in `agents/_prepare_rag.py`
+  **in-process** (no subprocess, no dependency on files outside the deployed `agents/`
+  directory). It scans `agents/_uploads/` plus `public/prepare-rag/files/` (if present, i.e. local
+  full builds), re-embeds everything locally with `fastembed`, and rewrites `agents/_data`.
+
+After a rebuild, the chat's vector layer auto-reloads (mtime watermark in `agents/_vector.py`) so
+new documents are queryable without restarting the agent.
+
+> **Why everything lives in `agents/`:** the EdgeOne Makers agent runtime only deploys the
+> `agents/` directory — `public/` is not present in the sandbox. So uploads go to
+> `agents/_uploads/`, the builder runs from `agents/_prepare_rag.py`, and vectors are written to
+> `agents/_data/` (all inside the sandbox the chat agent already reads). `public/prepare-rag/
+> prepare_rag_data.py` is now just a thin shim for the local `npm run prepare-rag` full build.
 
 Sandbox credentials are injected by the runtime — no local sandbox config is needed. Per `edgeone.json`, both the agent and its sandbox have a 300-second timeout (`agents.timeout`, `agents.sandbox.timeout`).
 
